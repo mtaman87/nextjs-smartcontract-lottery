@@ -2,8 +2,9 @@ import { contractAddresses, abi } from "../constants"
 // dont export from moralis when using react
 import { useMoralis, useWeb3Contract } from "react-moralis"
 import { useEffect, useState } from "react"
-import { useNotification } from "web3uikit"
+import { CryptoLogos, useNotification } from "web3uikit"
 import { ethers } from "ethers"
+import Logo from '../public/lottery.png'
 
 export default function LotteryEntrance() {
     const { Moralis, isWeb3Enabled, chainId: chainIdHex } = useMoralis()
@@ -110,8 +111,13 @@ export default function LotteryEntrance() {
     }
 
     return (
-        <div className="p-5 dark:text-white ">
-            <h1 className="py-4 px-4 font-bold text-3xl">Decentralized Lottery Pool</h1>
+        <div className="flex p-5 dark:text-white flex-col items-center justify-between">
+            <h1 className="py-4 px-4 font-bold text-3xl place-content-center">Decentralized Lottery Pool</h1>
+
+         
+            <img className="w-52 mt-5 mb-10" src="lottery.png"/>
+            
+            
             {raffleAddress ? (
                 <>
                     <button
@@ -140,7 +146,7 @@ export default function LotteryEntrance() {
                   
                 </>
             ) : (
-                <div>Please connect to a supported chain </div>
+                <div>Please connect wallet to a supported chain </div>
             )}
         </div>
     )
