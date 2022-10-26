@@ -1,6 +1,6 @@
 import { contractAddresses, abi } from "../constants"
 // dont export from moralis when using react
-import { useMoralis, useWeb3Contract } from "react-moralis"
+import { useMoralis, useWeb3Contract, useMoralisWeb3Api } from "react-moralis"
 import { useEffect, useState } from "react"
 import { CryptoLogos, useNotification } from "web3uikit"
 import { ethers } from "ethers"
@@ -13,11 +13,13 @@ export default function LotteryEntrance() {
     // console.log(`ChainId is ${chainId}`)
     const raffleAddress = chainId in contractAddresses ? contractAddresses[chainId][0] : null
 
+    const Web3Api = useMoralisWeb3Api();
     // State hooks
     // https://stackoverflow.com/questions/58252454/react-hooks-using-usestate-vs-just-variables
     const [entranceFee, setEntranceFee] = useState("0")
     const [numberOfEntrants, setNumberOfEntrants] = useState("0")
     const [recentWinner, setRecentWinner] = useState("0")
+    const [raffleBalance, setRaffleBalance] = useState("0")
 
     const dispatch = useNotification()
 
@@ -57,6 +59,10 @@ export default function LotteryEntrance() {
         params: {},
     })
 
+    // function NativeBalance() {
+    //     const { getBalances, data: balance, nativeToken, error, isLoading} = useNativeBalance({chain: chainId})
+    // }
+
     async function updateUIValues() {
         // Another way we could make a contract call:
         // const options = { abi, contractAddress: raffleAddress }
@@ -67,9 +73,19 @@ export default function LotteryEntrance() {
         const entranceFeeFromCall = (await getEntranceFee()).toString()
         const numPlayersFromCall = (await getPlayersNumber()).toString()
         const recentWinnerFromCall = await getRecentWinner()
+        
+        const options = {
+            address: raffleAddress,
+            
+        }
+
+        const balacesCall = await Web3Api.account.getTokenBalances(options);
+        
+        setRaffleBalance(balance.formatted)
         setEntranceFee(entranceFeeFromCall)
         setNumberOfEntrants(numPlayersFromCall)
         setRecentWinner(recentWinnerFromCall)
+        console.log(balance.formatted)
     }
 
     useEffect(() => {
@@ -139,6 +155,7 @@ export default function LotteryEntrance() {
                         )}
                     </button>
                     <div className=" mt-5 dark:bg-slate-600 flex-1 flex-col justify-around items-center rounded-lg px-6 py-6 ring-1 ring-slate-900/5 shadow-xl">
+                        <div>Entrance Fee: <div className="pl-5 text-yellow-200">{ethers.utils.formatUnits(entranceFee, "ether")} ETH</div></div>
                         <div>Entrance Fee: <div className="pl-5 text-yellow-200">{ethers.utils.formatUnits(entranceFee, "ether")} ETH</div></div>
                         <div>The current pool size is: <div className="pl-5 text-yellow-200">{numberOfEntrants} Entry Slips</div></div>
                         <div>The most previous winner was: <div className="pl-5 text-yellow-200">{recentWinner}</div></div>
